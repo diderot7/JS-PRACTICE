@@ -47,11 +47,41 @@
       background-color: white;
       width: 40vh;
       height: 50px;
-      border-radius: 25px;
+      border-radius: 15px;
+      border: 3px solid blue;
       display: flex;
       justify-content: space-around;
       align-items: center;
+      margin-bottom: 10px;
     }
+    #result {
+      background-color: white;
+      width: 40vh;
+      height: 50px;
+      border-radius: 15px;
+      border: 3px solid blue;
+
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #bonus,
+    #conusmerBonus {
+      width: 40px;
+      height: 40px;
+      background-color: white;
+      border-radius: 20px;
+      margin-left: 10px;
+    }
+    .bounsArea {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /* width: 40px;
+      height: 40px */
   </style>
 </head>
 
@@ -61,26 +91,25 @@
       <input type="text" id="input" placeholder="숫자를 입력하세요" />
       <button>선택</button>
     </form>
+    <p>내가 선택한 번호</p>
     <div id="consumerResult"></div>
-    <span id="conusmerBonus">내 보너스 점수</span>
-    <div id="result">추첨 결과는?</div>
-    <div id="bonus">보너스:</div>
+    <div class="bounsArea">
+      <p>나의 보너스 번호 :</p>
+      <div id="conusmerBonus"></div>
+    </div>
+
+    <p>당첨 번호</p>
+    <div id="result"></div>
+    <div class="bounsArea">
+      <p>보너스 번호 :</p>
+      <div id="bonus"></div>
+    </div>
   </div>
   <script>
-    // 사용자 영역
     const $form = document.querySelector("form");
     const $input = document.querySelector("input");
     const $consumerResult = document.querySelector("#consumerResult");
     const $conusmerBonus = document.querySelector("#conusmerBonus");
-    console.log($consumerResult);
-    // 구현 input 체크
-
-    // const drawBall = (number, $parent) => {
-    //         const $ball = document.createElement("div");
-    //         $ball.className = "ball";
-    //         $ball.textContent = number;
-    //         $parent.appendChild($ball);
-    //       };
 
     const checkInput = (input) => {
       if (input.length > 2) {
@@ -99,108 +128,117 @@
       return true;
     };
 
+    const drawBall = (number, $parent) => {
+      const $ball = document.createElement("div");
+      $ball.className = "ball";
+      $ball.textContent = number;
+      $parent.appendChild($ball);
+    };
+
     const consumerBall = [];
-    if (consumerBall.length !== 7) {
-      $form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const value = $input.value;
-        if (consumerBall.length < 7 && checkInput(value)) {
-          if (consumerBall.length === 6) {
-            const $ball = document.createElement("div");
-            $ball.className = "ball";
-            $ball.textContent = value;
-            $conusmerBonus.appendChild($ball);
-            consumerBall.push(value);
-          } else {
-            const $ball = document.createElement("div");
-            $ball.className = "ball";
-            $ball.textContent = value;
-            $consumerResult.appendChild($ball);
-            consumerBall.push(value);
-          }
-          if (consumerBall.length === 7) {
-            $form.classList.add("hidden");
-            console.log(consumerBall);
-            const candidate = Array(45)
-              .fill()
-              .map((v, i) => i + 1);
+    const conusmerBonusBall = [];
 
-            const shuffle = [];
+    // if (consumerBall.length !== 6 && conusmerBonusBall.length !== 1) {
+    $form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const value = $input.value;
+      // 사용자 로또번호 선택 구현
+      if (
+        consumerBall.length <= 6 &&
+        checkInput(value) &&
+        conusmerBonusBall.length < 1
+      ) {
+        if (consumerBall.length === 6) {
+          drawBall(value, $conusmerBonus);
+          conusmerBonusBall.push(value);
+        } else {
+          drawBall(value, $consumerResult);
+          consumerBall.push(value);
+        }
+      }
+      // 사용자가 번호를 모두 선택했을 때 랜덤추출 구현
+      if (consumerBall.length === 6 && conusmerBonusBall.length === 1) {
+        // 사용자가 모든 번호를 선택시 hidden으로 form사라지게 구현
+        $form.classList.add("hidden");
+        const candidate = Array(99)
+          .fill()
+          .map((v, i) => i + 1);
 
-            // 무작위로 숫자 섞기
-            while (candidate.length > 0) {
-              const random = Math.floor(Math.random() * candidate.length); // 무작위 인덱스 뽑기
-              const spliceArray = candidate.splice(random, 1); // 무작위 인덱스를 뽑은 배열 값 저장
-              const value = spliceArray[0]; // 배열에 들어 있는 값을 꺼내어
-              shuffle.push(value); // shuffle 배열에 넣기
-            }
+        const shuffle = [];
 
-            // for (let i = candidate.length; i > 0; i--) {
-            //   const random = Math.floor(Math.random() * i);
-            //   const spliceArray = candidate.splice(random, 1); // 무작위 인덱스를 뽑은 배열 값 저장
-            //   const value = spliceArray[0]; // 배열에 들어 있는 값을 꺼내어
-            //   shuffle.push(value);
-            // } => 조건이 간단하면 while문이 편하고, 조건이 복잡하면 for문이 편하다. || 정확히 몇번 문이 돌아야하는지 알때는 for문이 편하고 그게 아니라면 while이 편하다.
+        // 무작위로 숫자 섞기
+        while (candidate.length > 0) {
+          const random = Math.floor(Math.random() * candidate.length); // 무작위 인덱스 뽑기
+          const spliceArray = candidate.splice(random, 1); // 무작위 인덱스를 뽑은 배열 값 저장
+          const value = spliceArray[0]; // 배열에 들어 있는 값을 꺼내어
+          shuffle.push(value); // shuffle 배열에 넣기
+        }
 
-            // console.log(shuffle);
-            const winballs = shuffle.slice(0, 6).sort((a, b) => a - b);
-            const bouns = shuffle[6];
-            const $result = document.querySelector("#result");
+        // 랜덤 번호 구현
+        const winballs = shuffle.slice(0, 6).sort((a, b) => a - b);
+        const bouns = shuffle[6];
+        const $result = document.querySelector("#result");
 
-            const drawBall = (number, $parent) => {
-              const $ball = document.createElement("div");
-              $ball.className = "ball";
-              $ball.textContent = number;
-              $parent.appendChild($ball);
-            };
-            console.log(winballs);
-            let winningLottoNumber = 0;
-            let winningLottoBonusNumber = 0;
-            for (let i = 0; i < winballs.length; i++) {
-              console.log(
-                consumerBall[i],
-                consumerBall.includes(String(winballs[i]))
-                // includes는 type도 똑같아야함
-              );
-              if (consumerBall.includes(String(winballs[i])) === true) {
-                winningLottoNumber++;
-              }
-            }
-            if (bouns === consumerBall[consumerBall.length - 1]) {
-              winningLottoBonusNumber += 1;
-            }
-            console.log(winningLottoNumber);
-            for (let i = 0; i < winballs.length; i++) {
-              setTimeout(() => {
-                drawBall(winballs[i], $result);
-              }, (i + 1) * 1000);
-            }
-            const $bonus = document.querySelector("#bonus");
-            setTimeout(() => {
-              drawBall(bouns, $bonus);
-            }, 7000);
-            setTimeout(() => {
-              if (winningLottoNumber === 6) {
-                return alert("1등");
-              } else if (
-                winningLottoNumber === 5 &&
-                winningLottoBonusNumber === 1
-              ) {
-                return alert("2등");
-              } else if (winningLottoNumber === 5) {
-                return alert("3등");
-              } else if (winningLottoNumber === 4) {
-                return alert("4등");
-              } else if (winningLottoNumber === 3) {
-                return alert("3등");
-              } else if (winningLottoNumber <= 2) {
-                return alert("꽝!");
-              }
-            }, 9000);
+        // const drawBall = (number, $parent) => {
+        //   const $ball = document.createElement("div");
+        //   $ball.className = "ball";
+        //   $ball.textContent = number;
+        //   $parent.appendChild($ball);
+        // };
+
+        // 사용자 번호, 시스템 랜덤번호 등수 추출
+        let winningLottoNumber = 0;
+        let winningLottoBonusNumber = 0;
+        for (let i = 0; i < winballs.length; i++) {
+          console.log(
+            consumerBall[i],
+            consumerBall.includes(String(winballs[i]))
+            // includes는 type도 똑같아야함
+          );
+          if (consumerBall.includes(String(winballs[i])) === true) {
+            winningLottoNumber += 1;
           }
         }
-        $input.value = "";
-      });
-    }
+        if (bouns === conusmerBonusBall[0]) {
+          winningLottoBonusNumber += 1;
+        }
+
+        // 랜덤 로또 번호 구현
+        for (let i = 0; i < winballs.length; i++) {
+          setTimeout(() => {
+            drawBall(winballs[i], $result);
+          }, (i + 1) * 1000);
+        }
+
+        // 랜덤 로또 보너스 번호 구현
+        const $bonus = document.querySelector("#bonus");
+        setTimeout(() => {
+          drawBall(bouns, $bonus);
+        }, 7000);
+
+        // 192번줄 화면에 보이게 구현
+        // => 랜덤으로 뽑은 번호가 다 추출하고 나와야해서 setTimeout 9초로 설정
+        setTimeout(() => {
+          if (winningLottoNumber === 6) {
+            return alert("1등");
+          } else if (
+            winningLottoNumber === 5 &&
+            winningLottoBonusNumber === 1
+          ) {
+            return alert("2등");
+          } else if (winningLottoNumber === 5) {
+            return alert("3등");
+          } else if (winningLottoNumber === 4) {
+            return alert("4등");
+          } else if (winningLottoNumber === 3) {
+            return alert("3등");
+          } else if (winningLottoNumber <= 2) {
+            return alert("꽝!");
+          }
+        }, 9000);
+      }
+      $input.value = "";
+    });
+    // }
   </script>
 </body>
