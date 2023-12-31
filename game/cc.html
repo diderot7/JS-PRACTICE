@@ -47,11 +47,41 @@
       background-color: white;
       width: 40vh;
       height: 50px;
-      border-radius: 25px;
+      border-radius: 15px;
+      border: 3px solid blue;
       display: flex;
       justify-content: space-around;
       align-items: center;
+      margin-bottom: 10px;
     }
+    #result {
+      background-color: white;
+      width: 40vh;
+      height: 50px;
+      border-radius: 15px;
+      border: 3px solid blue;
+
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #bonus,
+    #conusmerBonus {
+      width: 40px;
+      height: 40px;
+      background-color: white;
+      border-radius: 20px;
+      margin-left: 10px;
+    }
+    .bounsArea {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    /* width: 40px;
+      height: 40px */
   </style>
 </head>
 
@@ -61,10 +91,19 @@
       <input type="text" id="input" placeholder="숫자를 입력하세요" />
       <button>선택</button>
     </form>
+    <p>내가 선택한 번호</p>
     <div id="consumerResult"></div>
-    <span id="conusmerBonus">내 보너스 점수</span>
-    <div id="result">추첨 결과는?</div>
-    <div id="bonus">보너스:</div>
+    <div class="bounsArea">
+      <p>나의 보너스 번호 :</p>
+      <div id="conusmerBonus"></div>
+    </div>
+
+    <p>당첨 번호</p>
+    <div id="result"></div>
+    <div class="bounsArea">
+      <p>보너스 번호 :</p>
+      <div id="bonus"></div>
+    </div>
   </div>
   <script>
     // 사용자 영역
@@ -100,28 +139,40 @@
     };
 
     const consumerBall = [];
-    if (consumerBall.length !== 7) {
+    const conusmerBonusBall = [];
+
+    if (consumerBall.length !== 6 && conusmerBonusBall.length !== 1) {
       $form.addEventListener("submit", (e) => {
         e.preventDefault();
         const value = $input.value;
-        if (consumerBall.length < 7 && checkInput(value)) {
-          if (consumerBall.length === 6) {
-            const $ball = document.createElement("div");
-            $ball.className = "ball";
-            $ball.textContent = value;
-            $conusmerBonus.appendChild($ball);
-            consumerBall.push(value);
-          } else {
+        if (
+          checkInput(value) &&
+          consumerBall.length === 6 &&
+          conusmerBonusBall.length === 1
+        ) {
+          if (consumerBall.length !== 6) {
             const $ball = document.createElement("div");
             $ball.className = "ball";
             $ball.textContent = value;
             $consumerResult.appendChild($ball);
             consumerBall.push(value);
+          } else {
+            const $ball = document.createElement("div");
+            $ball.className = "ball";
+            $ball.textContent = value;
+            $conusmerBonus.appendChild($ball);
+            conusmerBonusBall.push(value);
+            //  const $bonus = document.querySelector("#bonus");
+            // setTimeout(() => {
+            //   drawBall(bouns, $bonus);
+            // }, 7000);
           }
-          if (consumerBall.length === 7) {
+
+          // 사용자가 7개의 번호를 뽑기 전까지 로또 번호를 추출하지 않는다.
+          if (consumerBall.length === 6 && conusmerBonusBall.length === 1) {
             $form.classList.add("hidden");
             console.log(consumerBall);
-            const candidate = Array(45)
+            const candidate = Array(99)
               .fill()
               .map((v, i) => i + 1);
 
@@ -135,14 +186,6 @@
               shuffle.push(value); // shuffle 배열에 넣기
             }
 
-            // for (let i = candidate.length; i > 0; i--) {
-            //   const random = Math.floor(Math.random() * i);
-            //   const spliceArray = candidate.splice(random, 1); // 무작위 인덱스를 뽑은 배열 값 저장
-            //   const value = spliceArray[0]; // 배열에 들어 있는 값을 꺼내어
-            //   shuffle.push(value);
-            // } => 조건이 간단하면 while문이 편하고, 조건이 복잡하면 for문이 편하다. || 정확히 몇번 문이 돌아야하는지 알때는 for문이 편하고 그게 아니라면 while이 편하다.
-
-            // console.log(shuffle);
             const winballs = shuffle.slice(0, 6).sort((a, b) => a - b);
             const bouns = shuffle[6];
             const $result = document.querySelector("#result");
@@ -153,23 +196,7 @@
               $ball.textContent = number;
               $parent.appendChild($ball);
             };
-            console.log(winballs);
-            let winningLottoNumber = 0;
-            let winningLottoBonusNumber = 0;
-            for (let i = 0; i < winballs.length; i++) {
-              console.log(
-                consumerBall[i],
-                consumerBall.includes(String(winballs[i]))
-                // includes는 type도 똑같아야함
-              );
-              if (consumerBall.includes(String(winballs[i])) === true) {
-                winningLottoNumber++;
-              }
-            }
-            if (bouns === consumerBall[consumerBall.length - 1]) {
-              winningLottoBonusNumber += 1;
-            }
-            console.log(winningLottoNumber);
+
             for (let i = 0; i < winballs.length; i++) {
               setTimeout(() => {
                 drawBall(winballs[i], $result);
@@ -179,6 +206,23 @@
             setTimeout(() => {
               drawBall(bouns, $bonus);
             }, 7000);
+
+            let winningLottoNumber = 0;
+            let winningLottoBonusNumber = 0;
+            for (let i = 0; i < winballs.length; i++) {
+              console.log(
+                consumerBall[i],
+                consumerBall.includes(String(winballs[i]))
+                // includes는 type도 똑같아야 true를 return함
+              );
+              if (consumerBall.includes(String(winballs[i])) === true) {
+                winningLottoNumber++;
+              }
+            }
+            if (bouns === conusmerBonusBall) {
+              winningLottoBonusNumber += 1;
+            }
+
             setTimeout(() => {
               if (winningLottoNumber === 6) {
                 return alert("1등");
