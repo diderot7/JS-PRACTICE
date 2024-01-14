@@ -17,10 +17,16 @@
       <button id="rock" class="btn">바위</button>
       <button id="paper" class="btn">보</button>
     </div>
-    <div id="score">0</div>
+    <div id="score">사람 승리 : 총 점수 0</div>
+    <div id="computerScore">컴퓨터 승리 : 총 점수 0</div>
+    <div id="message"></div>
+
     <script>
       const $computer = document.querySelector("#computer");
       const $score = document.querySelector("#score");
+      const $computerScore = document.querySelector("#computerScore");
+      const $message = document.querySelector("#message");
+
       const $rock = document.querySelector("#rock");
       const $scissors = document.querySelector("#scissors");
       const $paper = document.querySelector("#paper");
@@ -35,6 +41,7 @@
       };
 
       let computerChoice = "scissors";
+
       const changeComputerHand = () => {
         if (computerChoice === "rock") {
           // 바위면
@@ -50,6 +57,66 @@
         $computer.style.backgroundSize = "auto 200px";
       };
       let intervalId = setInterval(changeComputerHand, 50);
+
+      const scoreTable = {
+        rock: 0,
+        scissors: 1,
+        paper: -1,
+      };
+
+      let myWinnerscore = 0;
+      let computerWinnerscore = 0;
+
+      let clickable = true;
+      const clickButton = () => {
+        if (clickable) {
+          clearInterval(intervalId);
+          clickable = false;
+          // clickable을 false로 만들어서 바로 클릭을 못하게 만듬
+          // 점수 계산 및 화면 표시
+          const myChoice =
+            event.target.textContent === "바위"
+              ? "rock"
+              : event.target.textContent === "가위"
+              ? "scissors"
+              : "paper";
+          const myScore = scoreTable[myChoice];
+          const computerScore = scoreTable[computerChoice];
+          const diff = myScore - computerScore;
+
+          let message;
+          // 2, -1은 승리조건이고, -2, 1은 패배조건, 점수표 참고
+          if ([2, -1].includes(diff)) {
+            myWinnerscore += 1;
+            $message.textContent = "현재 라운드 : 사람 승리";
+          } else if ([-2, 1].includes(diff)) {
+            computerWinnerscore += 1;
+            $message.textContent = "현재 라운드 : 컴퓨터 승리";
+          } else {
+            $message.textContent = "현재 라운드 : 무승부";
+          }
+          $score.textContent = `사람 승리 : 총: ${myWinnerscore}점`;
+          $computerScore.textContent = ` 컴퓨터 승리 : 총: ${computerWinnerscore}점`;
+          if (myWinnerscore === 3) {
+            $message.textContent = `최종라운드 : 사람 승리, 게임 종료`;
+            $score.textContent = "";
+            $computerScore.textContent = "";
+            return;
+          } else if (computerWinnerscore === 3) {
+            $message.textContent = `최종라운드 : 컴퓨터 승리, 게임 종료`;
+            $score.textContent = "";
+            $computerScore.textContent = "";
+            return;
+          }
+
+          setTimeout(() => {
+            clickable = true;
+            intervalId = setInterval(changeComputerHand, 50);
+          }, 1000);
+        }
+      };
+      // 객체 비교 방법 => 변수에 넣어서 비교
+      // let a = {}; let b =a;
 
       $rock.addEventListener("click", clickButton);
       $scissors.addEventListener("click", clickButton);
