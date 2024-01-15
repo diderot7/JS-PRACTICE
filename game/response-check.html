@@ -24,28 +24,64 @@
   </head>
   <body>
     <div id="screen" class="waiting">클릭해서 시작하세요</div>
-    <div id="result"></div>
+    <div id="result">결과 :</div>
     <script>
       const $screen = document.querySelector("#screen");
       const $result = document.querySelector("#result");
 
+      let startTime;
+      let endTime; // 변수는 블록스코프
+      let timeId;
+      const records = [];
       $screen.addEventListener("click", () => {
         if ($screen.classList.contains("waiting")) {
+          startTime = new Date();
           $screen.classList.remove("waiting");
           $screen.classList.add("ready");
-          $result.textContent = "초록화면이 나올 때 까지 클릭하지 마세요";
-          setTimeout(() => {
+
+          timeId = setTimeout(() => {
+            new Date();
             $screen.classList.remove("ready");
             $screen.classList.add("now");
-            $result.textContent = "클릭하세요!";
+            $screen.textContent = "클릭하세요!";
           }, Math.floor(Math.random() * 1000) + 2000); // 2초에서 3초 사이 2000~3000 사이 수
           // 나는 아래 esle if에 setTimeout을 작성한는걸 생각했는데 그건 클릭 후에 나오는 문제라 그러면 성급하게 클릭하는걸 막을 수 없다.
           // 비동기 문제로 setTimeout을 실행하기 전에 클릭하면 "성급한 클릭" 그래서 위에 setTimeout을 작성한 것
         } else if ($screen.classList.contains("ready")) {
+          clearTimeout(timeId);
+          $screen.classList.remove("ready");
+          $screen.classList.add("waiting");
+          $screen.textContent = "너무 성급한 클릭이에요!";
         } else if ($screen.classList.contains("now")) {
-          console.log("준비2");
+          endTime = new Date();
+          const current = endTime - startTime;
+          records.push(current);
+          const average = records.reduce((a, c) => a + c) / records.length;
+
+          // for (let i = 0; i < topFive.length; i++) {
+          //   $rank.append(
+          //     document.createElement("br"),
+          //     `${i + 1}위: top : ${records[i]}ms`
+          //   );
+          // }
+          const topFive = records.sort((a, b) => b - a).slice(0, 5);
+          $result.textContent = `현재 ${current}ms, 평균${average}ms`;
+          topFive.forEach((top, index) => {
+            $result.append(
+              document.createElement("br"),
+              `${index + 1}위: top : ${top}ms`
+            );
+          });
+
+          startTime = null;
+          endTime = null;
+          $screen.classList.remove("now");
+          $screen.classList.add("waiting");
+          $screen.textContent = "클릭해서 시작하세요";
         }
       });
     </script>
   </body>
 </html>
+
+<!-- (new Date(2021, 2, 3) - new Date(2021, 1, 3)) / 1000(초) / 60(분) / 60(시) / 24(날) // 미래의 날짜 - 과거의 날짜 (시간 계산)-->
