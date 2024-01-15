@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>반응속도</title>
+    <style>
+      #screen {
+        width: 300px;
+        height: 200px;
+        text-align: center;
+        user-select: none;
+      }
+      #screen.waiting {
+        background-color: aqua;
+      }
+      #screen.ready {
+        background-color: red;
+        color: white;
+      }
+      #screen.now {
+        background-color: greenyellow;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="screen" class="waiting">클릭해서 시작하세요</div>
+    <div id="result"></div>
+    <script>
+      const $screen = document.querySelector("#screen");
+      const $result = document.querySelector("#result");
+
+      $screen.addEventListener("click", () => {
+        if ($screen.classList.contains("waiting")) {
+          $screen.classList.remove("waiting");
+          $screen.classList.add("ready");
+          $result.textContent = "초록화면이 나올 때 까지 클릭하지 마세요";
+          setTimeout(() => {
+            $screen.classList.remove("ready");
+            $screen.classList.add("now");
+            $result.textContent = "클릭하세요!";
+          }, Math.floor(Math.random() * 1000) + 2000); // 2초에서 3초 사이 2000~3000 사이 수
+          // 나는 아래 esle if에 setTimeout을 작성한는걸 생각했는데 그건 클릭 후에 나오는 문제라 그러면 성급하게 클릭하는걸 막을 수 없다.
+          // 비동기 문제로 setTimeout을 실행하기 전에 클릭하면 "성급한 클릭" 그래서 위에 setTimeout을 작성한 것
+        } else if ($screen.classList.contains("ready")) {
+        } else if ($screen.classList.contains("now")) {
+          console.log("준비2");
+        }
+      });
+    </script>
+  </body>
+</html>
