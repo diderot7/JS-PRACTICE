@@ -1,0 +1,81 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div><span id="order">1</span>번째 참가자</div>
+    <div>제시어 : <span id="word"></span></div>
+    <input type="text" />
+    <button>입력</button>
+
+    <script>
+      const number = Number(prompt("몇 명이 참가하나요?"));
+      if (number) {
+        const $order = document.querySelector("#order");
+        const $word = document.querySelector("#word");
+        const $input = document.querySelector("input");
+        const $button = document.querySelector("button");
+        const numArray = Array(number)
+          .fill()
+          .map((v, i) => i + 1);
+
+        let word;
+        let newWord;
+        const compareArray = [];
+        let order = Number($order.textContent) - 1;
+        const onClickButton = () => {
+          if (
+            (!word || word[word.length - 1] === newWord[0]) &&
+            newWord.length === 3
+          ) {
+            if (compareArray.includes(newWord) === false) {
+              word = newWord;
+              $word.textContent = word;
+              compareArray.push(word);
+              console.log(compareArray, numArray);
+
+              if (numArray[order] + 1 > numArray.length) {
+                $order.textContent = numArray[0];
+                order = 0;
+              } else {
+                $order.textContent = numArray[order + 1];
+                order += 1;
+              }
+            } else {
+              alert("이미 있는 단어입니다. 탈락입니다.");
+              numArray.splice(numArray.indexOf(numArray[order]), 1);
+              $order.textContent = numArray[order];
+              console.log(numArray, order);
+            }
+          } else if (newWord.length !== 3) {
+            alert("작성해야 할 단어는 총 3글자입니다.");
+          } else {
+            alert(
+              `잘못된 단어입니다. ${numArray[order]}번 참가자는 탈락입니다.`
+            );
+            numArray.splice(numArray.indexOf(numArray[order]), 1);
+            $order.textContent = numArray[order];
+            console.log(numArray, order);
+          }
+          if (numArray.length === 1) {
+            alert(
+              `게임이 종료되었습니다 승리자는${numArray[0]}번 참가자입니다`
+            );
+          }
+          $input.value = "";
+          $input.focus();
+          console.log(newWord);
+        };
+
+        const onInput = (event) => {
+          newWord = event.target.value;
+        };
+
+        $button.addEventListener("click", onClickButton);
+        $input.addEventListener("input", onInput);
+      }
+    </script>
+  </body>
+</html>
